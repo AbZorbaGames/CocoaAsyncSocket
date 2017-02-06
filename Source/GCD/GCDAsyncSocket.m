@@ -11,7 +11,7 @@
 #import "GCDAsyncSocket.h"
 
 #if TARGET_OS_IPHONE
-#import <CFNetwork/CFNetwork.h>
+@import CFNetwork;
 #endif
 
 #import <TargetConditionals.h>
@@ -932,7 +932,7 @@ enum GCDAsyncSocketConfig
 	return [self initWithDelegate:aDelegate delegateQueue:dq socketQueue:NULL];
 }
 
-- (id)initWithDelegate:(id<GCDAsyncSocketDelegate>)aDelegate delegateQueue:(dispatch_queue_t)dq socketQueue:(dispatch_queue_t)sq
+- (id)initWithDelegate:(id)aDelegate delegateQueue:(dispatch_queue_t)dq socketQueue:(dispatch_queue_t)sq
 {
 	if((self = [super init]))
 	{
@@ -1295,16 +1295,20 @@ enum GCDAsyncSocketConfig
 	
 	dispatch_block_t block = ^{
 		
-		if (flag)
+        if (flag) {
 			config &= ~kPreferIPv6;
-		else
+        }
+        else {
 			config |= kPreferIPv6;
+        }
 	};
 	
-	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
+    if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey)) {
 		block();
-	else
+    }
+    else {
 		dispatch_async(socketQueue, block);
+    }
 }
 
 - (NSTimeInterval) alternateAddressDelay {
@@ -1312,10 +1316,12 @@ enum GCDAsyncSocketConfig
     dispatch_block_t block = ^{
         delay = alternateAddressDelay;
     };
-    if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
+    if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey)) {
         block();
-    else
+    }
+    else {
         dispatch_sync(socketQueue, block);
+    }
     return delay;
 }
 
@@ -1323,10 +1329,12 @@ enum GCDAsyncSocketConfig
     dispatch_block_t block = ^{
         alternateAddressDelay = delay;
     };
-    if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
+    if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey)) {
         block();
-    else
+    }
+    else {
         dispatch_async(socketQueue, block);
+    }
 }
 
 - (id)userData
@@ -1671,17 +1679,20 @@ enum GCDAsyncSocketConfig
 		result = YES;
 	}};
 	
-	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
+    if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey)) {
 		block();
-	else
+    }
+    else {
 		dispatch_sync(socketQueue, block);
+    }
 	
 	if (result == NO)
 	{
 		LogInfo(@"Error in accept: %@", err);
 		
-		if (errPtr)
+        if (errPtr) {
 			*errPtr = err;
+        }
 	}
 	
 	return result;
@@ -1872,17 +1883,20 @@ enum GCDAsyncSocketConfig
 		result = YES;
 	}};
 	
-	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
+    if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey)) {
 		block();
-	else
+    }
+    else {
 		dispatch_sync(socketQueue, block);
+    }
 	
 	if (result == NO)
 	{
 		LogInfo(@"Error in accept: %@", err);
 		
-		if (errPtr)
+        if (errPtr) {
 			*errPtr = err;
+        }
 	}
 	
 	return result;	
@@ -1954,8 +1968,6 @@ enum GCDAsyncSocketConfig
 	if (result == -1)
 	{
 		LogWarn(@"Error enabling non-blocking IO on accepted socket (fcntl)");
-		LogVerbose(@"close(childSocketFD)");
-		close(childSocketFD);
 		return NO;
 	}
 	
@@ -1988,12 +2000,15 @@ enum GCDAsyncSocketConfig
 																	  delegateQueue:delegateQueue
 																		socketQueue:childSocketQueue];
 			
-			if (socketType == 0)
+            if (socketType == 0) {
 				acceptedSocket->socket4FD = childSocketFD;
-			else if (socketType == 1)
+            }
+            else if (socketType == 1) {
 				acceptedSocket->socket6FD = childSocketFD;
-			else
+            }
+            else {
 				acceptedSocket->socketUN = childSocketFD;
+            }
 			
 			acceptedSocket->flags = (kSocketStarted | kConnected);
 			
@@ -3095,8 +3110,8 @@ enum GCDAsyncSocketConfig
 	
 	[self endConnectTimeout];
 	
-	if (currentRead != nil)  [self endCurrentRead];
-	if (currentWrite != nil) [self endCurrentWrite];
+    if (currentRead != nil) { [self endCurrentRead]; }
+    if (currentWrite != nil) { [self endCurrentWrite]; }
 	
 	[readQueue removeAllObjects];
 	[writeQueue removeAllObjects];
@@ -3274,10 +3289,12 @@ enum GCDAsyncSocketConfig
 	
 	// Synchronous disconnection, as documented in the header file
 	
-	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
+    if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey)) {
 		block();
-	else
+    }
+    else {
 		dispatch_sync(socketQueue, block);
+    }
 }
 
 - (void)disconnectAfterReading
@@ -6250,13 +6267,16 @@ enum GCDAsyncSocketConfig
 			
 			__strong id theDelegate = delegate;
 
-			if (delegateQueue && [theDelegate respondsToSelector:@selector(socket:didWritePartialDataOfLength:tag:)])
+            if (delegateQueue && [theDelegate respondsToSelector:@selector(socket:didWritePartialData:ofLength:tag:)])
 			{
 				long theWriteTag = currentWrite->tag;
+                NSData *const data = currentWrite->buffer;
 				
 				dispatch_async(delegateQueue, ^{ @autoreleasepool {
-					
-					[theDelegate socket:self didWritePartialDataOfLength:bytesWritten tag:theWriteTag];
+                    [theDelegate socket:self
+                    didWritePartialData:data
+                               ofLength:bytesWritten
+                                    tag:theWriteTag];
 				}});
 			}
 		}
@@ -6279,15 +6299,17 @@ enum GCDAsyncSocketConfig
 	NSAssert(currentWrite, @"Trying to complete current write when there is no current write.");
 	
 
-	__strong id theDelegate = delegate;
+	__strong id<GCDAsyncSocketDelegate> theDelegate = delegate;
 	
-	if (delegateQueue && [theDelegate respondsToSelector:@selector(socket:didWriteDataWithTag:)])
+    if (delegateQueue && [theDelegate respondsToSelector:@selector(socket:didWriteData:withTag:)])
 	{
 		long theWriteTag = currentWrite->tag;
+        NSData *const data = currentWrite->buffer;
 		
 		dispatch_async(delegateQueue, ^{ @autoreleasepool {
-			
-			[theDelegate socket:self didWriteDataWithTag:theWriteTag];
+            [theDelegate socket:self
+                   didWriteData:data
+                        withTag:theWriteTag];
 		}});
 	}
 	
@@ -6316,7 +6338,7 @@ enum GCDAsyncSocketConfig
 		dispatch_source_set_event_handler(writeTimer, ^{ @autoreleasepool {
 		#pragma clang diagnostic push
 		#pragma clang diagnostic warning "-Wimplicit-retain-self"
-			
+
 			__strong GCDAsyncSocket *strongSelf = weakSelf;
 			if (strongSelf == nil) return_from_block;
 			

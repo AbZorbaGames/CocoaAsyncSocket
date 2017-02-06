@@ -8,7 +8,7 @@
 //  https://github.com/robbiehanson/CocoaAsyncSocket
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
 #import <dispatch/dispatch.h>
 #import <TargetConditionals.h>
 #import <Availability.h>

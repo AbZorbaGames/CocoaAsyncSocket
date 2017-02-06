@@ -8,9 +8,8 @@
 //  https://github.com/robbiehanson/CocoaAsyncSocket
 //
 
-#import <Foundation/Foundation.h>
-#import <Security/Security.h>
-#import <Security/SecureTransport.h>
+@import Foundation;
+@import Security;
 #import <dispatch/dispatch.h>
 #import <Availability.h>
 
@@ -1108,13 +1107,13 @@ typedef NS_ENUM(NSInteger, GCDAsyncSocketError) {
 /**
  * Called when a socket has completed writing the requested data. Not called if there is an error.
 **/
-- (void)socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag;
+- (void)socket:(GCDAsyncSocket *)sock didWriteData:(NSData *)data withTag:(long)tag;
 
 /**
  * Called when a socket has written some data, but has not yet completed the entire write.
  * It may be used to for things such as updating progress bars.
 **/
-- (void)socket:(GCDAsyncSocket *)sock didWritePartialDataOfLength:(NSUInteger)partialLength tag:(long)tag;
+- (void)socket:(GCDAsyncSocket *)sock didWritePartialData:(NSData *)data ofLength:(NSUInteger)partialLength tag:(long)tag;
 
 /**
  * Called if a read operation has reached its timeout without completing.
