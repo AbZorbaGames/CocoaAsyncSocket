@@ -2076,8 +2076,7 @@ enum GCDAsyncSocketConfig
 	{
 		if (errPtr)
 		{
-			NSString *msg = @"Attempting to connect while connected or accepting connections. Disconnect first.";
-			*errPtr = [self badConfigError:msg];
+			*errPtr = [self alreadyConnectedError];
 		}
 		return NO;
 	}
@@ -2171,8 +2170,7 @@ enum GCDAsyncSocketConfig
 	{
 		if (errPtr)
 		{
-			NSString *msg = @"Attempting to connect while connected or accepting connections. Disconnect first.";
-			*errPtr = [self badConfigError:msg];
+			*errPtr = [self alreadyConnectedError];
 		}
 		return NO;
 	}
@@ -3378,6 +3376,16 @@ enum GCDAsyncSocketConfig
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Errors
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (NSError *)alreadyConnectedError {
+    NSString *errMsg = @"Attempting to connect while connected or accepting connections. Disconnect first.";
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObject:errMsg
+                                                         forKey:NSLocalizedDescriptionKey];
+    return [NSError errorWithDomain:GCDAsyncSocketErrorDomain
+                               code:GCDAsyncSocketAlreadyConnected
+                           userInfo:userInfo];
+    
+}
 
 - (NSError *)badConfigError:(NSString *)errMsg
 {

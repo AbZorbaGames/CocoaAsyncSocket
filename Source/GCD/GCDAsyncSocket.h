@@ -51,6 +51,7 @@ extern NSString *const GCDAsyncSocketSSLDiffieHellmanParameters;
 typedef NS_ENUM(NSInteger, GCDAsyncSocketError) {
 	GCDAsyncSocketNoError = 0,           // Never used
 	GCDAsyncSocketBadConfigError,        // Invalid configuration
+    GCDAsyncSocketAlreadyConnected,      // Already connected
 	GCDAsyncSocketBadParamError,         // Invalid parameter was passed
 	GCDAsyncSocketConnectTimeoutError,   // A connect operation timed out
 	GCDAsyncSocketReadTimeoutError,      // A read operation timed out
