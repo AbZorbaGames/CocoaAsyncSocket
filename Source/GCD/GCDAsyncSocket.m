@@ -916,22 +916,26 @@ enum GCDAsyncSocketConfig
     NSTimeInterval alternateAddressDelay;
 }
 
-- (id)init
+- (instancetype)init
 {
 	return [self initWithDelegate:nil delegateQueue:NULL socketQueue:NULL];
 }
 
-- (id)initWithSocketQueue:(dispatch_queue_t)sq
+- (instancetype)initWithSocketQueue:(dispatch_queue_t)sq
 {
 	return [self initWithDelegate:nil delegateQueue:NULL socketQueue:sq];
 }
 
-- (id)initWithDelegate:(id)aDelegate delegateQueue:(dispatch_queue_t)dq
+- (instancetype)initWithDelegate:(nullable id<GCDAsyncSocketDelegate>)aDelegate
+                   delegateQueue:(nullable dispatch_queue_t)dq
 {
 	return [self initWithDelegate:aDelegate delegateQueue:dq socketQueue:NULL];
 }
 
-- (id)initWithDelegate:(id)aDelegate delegateQueue:(dispatch_queue_t)dq socketQueue:(dispatch_queue_t)sq
+
+- (instancetype)initWithDelegate:(nullable id<GCDAsyncSocketDelegate>)aDelegate
+                   delegateQueue:(nullable dispatch_queue_t)dq
+                     socketQueue:(nullable dispatch_queue_t)sq
 {
 	if((self = [super init]))
 	{
@@ -1037,15 +1041,32 @@ enum GCDAsyncSocketConfig
 
 #pragma mark -
 
-+ (nullable instancetype)socketFromConnectedSocketFD:(int)socketFD socketQueue:(nullable dispatch_queue_t)sq error:(NSError**)error {
-  return [self socketFromConnectedSocketFD:socketFD delegate:nil delegateQueue:NULL socketQueue:sq error:error];
++ (nullable instancetype)socketFromConnectedSocketFD:(int)socketFD
+                                         socketQueue:(nullable dispatch_queue_t)sq
+                                               error:(NSError**)error {
+  return [self socketFromConnectedSocketFD:socketFD
+                                  delegate:nil
+                             delegateQueue:NULL
+                               socketQueue:sq
+                                     error:error];
 }
 
-+ (nullable instancetype)socketFromConnectedSocketFD:(int)socketFD delegate:(nullable id<GCDAsyncSocketDelegate>)aDelegate delegateQueue:(nullable dispatch_queue_t)dq error:(NSError**)error {
-  return [self socketFromConnectedSocketFD:socketFD delegate:aDelegate delegateQueue:dq socketQueue:NULL error:error];
++ (nullable instancetype)socketFromConnectedSocketFD:(int)socketFD
+                                            delegate:(nullable id<GCDAsyncSocketDelegate>)aDelegate
+                                       delegateQueue:(nullable dispatch_queue_t)dq
+                                               error:(NSError**)error {
+  return [self socketFromConnectedSocketFD:socketFD
+                                  delegate:aDelegate
+                             delegateQueue:dq
+                               socketQueue:NULL
+                                     error:error];
 }
 
-+ (nullable instancetype)socketFromConnectedSocketFD:(int)socketFD delegate:(nullable id<GCDAsyncSocketDelegate>)aDelegate delegateQueue:(nullable dispatch_queue_t)dq socketQueue:(nullable dispatch_queue_t)sq error:(NSError* __autoreleasing *)error
++ (nullable instancetype)socketFromConnectedSocketFD:(int)socketFD
+                                            delegate:(nullable id<GCDAsyncSocketDelegate>)aDelegate
+                                       delegateQueue:(nullable dispatch_queue_t)dq
+                                         socketQueue:(nullable dispatch_queue_t)sq
+                                               error:(NSError* __autoreleasing *)error
 {
   __block BOOL errorOccured = NO;
   
@@ -1238,10 +1259,12 @@ enum GCDAsyncSocketConfig
 		block();
 	}
 	else {
-		if (synchronously)
+        if (synchronously) {
 			dispatch_sync(socketQueue, block);
-		else
+        }
+        else {
 			dispatch_async(socketQueue, block);
+        }
 	}
 }
 
@@ -1337,7 +1360,7 @@ enum GCDAsyncSocketConfig
 	
 	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
 	{
-		return ((config & kPreferIPv6) == 0);
+		return ((self->config & kPreferIPv6) == 0);
 	}
 	else
 	{
@@ -1358,7 +1381,7 @@ enum GCDAsyncSocketConfig
 	dispatch_block_t block = ^{
 		
         if (flag) {
-			config &= ~kPreferIPv6;
+			self->config &= ~kPreferIPv6;
         }
         else {
             self->config |= kPreferIPv6;

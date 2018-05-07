@@ -338,28 +338,28 @@ enum GCDAsyncUdpSocketConfig
 
 @implementation GCDAsyncUdpSocket
 
-- (id)init
+- (instancetype)init
 {
 	LogTrace();
 	
 	return [self initWithDelegate:nil delegateQueue:NULL socketQueue:NULL];
 }
 
-- (id)initWithSocketQueue:(dispatch_queue_t)sq
+- (instancetype)initWithSocketQueue:(dispatch_queue_t)sq
 {
 	LogTrace();
 	
 	return [self initWithDelegate:nil delegateQueue:NULL socketQueue:sq];
 }
 
-- (id)initWithDelegate:(id <GCDAsyncUdpSocketDelegate>)aDelegate delegateQueue:(dispatch_queue_t)dq
+- (instancetype)initWithDelegate:(id <GCDAsyncUdpSocketDelegate>)aDelegate delegateQueue:(dispatch_queue_t)dq
 {
 	LogTrace();
 	
 	return [self initWithDelegate:aDelegate delegateQueue:dq socketQueue:NULL];
 }
 
-- (id)initWithDelegate:(id <GCDAsyncUdpSocketDelegate>)aDelegate delegateQueue:(dispatch_queue_t)dq socketQueue:(dispatch_queue_t)sq
+- (instancetype)initWithDelegate:(id <GCDAsyncUdpSocketDelegate>)aDelegate delegateQueue:(dispatch_queue_t)dq socketQueue:(dispatch_queue_t)sq
 {
 	LogTrace();
 	
