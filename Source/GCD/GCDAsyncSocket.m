@@ -2706,6 +2706,10 @@ enum GCDAsyncSocketConfig
     
     int nosigpipe = 1;
     setsockopt(socketFD, SOL_SOCKET, SO_NOSIGPIPE, &nosigpipe, sizeof(nosigpipe));
+
+
+    const int realTimeData = NET_SERVICE_TYPE_RD;
+    setsockopt(socketFD, SOL_SOCKET, SO_NET_SERVICE_TYPE , &realTimeData, sizeof(realTimeData));
     
     return socketFD;
 }
